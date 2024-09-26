@@ -1,14 +1,14 @@
 import { DataSource } from "typeorm"
-import { User } from "./schemas/user"
+import { User } from "./schemas/User"
 export const AppDataSource = new DataSource({
-  type: "postgres",
+  type: "mysql",
   host: "localhost",
-  port: 5432,
-  username: "test",
-  password: "test",
-  database: "test",
+  port: 3306,
+  username: "root",
+  password: "h2r@123456",
+  database: "h2r",
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [User],
   subscribers: [],
   migrations: [],
