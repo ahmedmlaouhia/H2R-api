@@ -36,11 +36,11 @@ export class AuthController {
   }
 
   static async getProfile(req: any, res: Response) {
-    if (!req[" currentUser"]) {
+    if (!req["currentUser"]) {
       return res.status(401).json({ message: "Unauthorized" })
     }
-    const user = await User.findOne({
-      where: { id: req[" currentUser"].id },
+    const user = await User.findOneBy({
+      id: req["currentUser"].id,
     })
     return res.status(200).json({ ...user, password: undefined })
   }

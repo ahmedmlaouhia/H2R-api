@@ -2,11 +2,7 @@ import { NextFunction, Response } from "express"
 import * as jwt from "jsonwebtoken"
 import "dotenv/config"
 
-export const authentification = (
-  req: any,
-  res: Response,
-  next: NextFunction
-) => {
+export const auth = (req: any, res: Response, next: NextFunction) => {
   const header = req.headers.authorization
   if (!header) {
     return res.status(401).json({ message: "Unauthorized" })
@@ -19,6 +15,6 @@ export const authentification = (
   if (!decode) {
     return res.status(401).json({ message: "Unauthorized" })
   }
-  req[" currentUser"] = decode
+  req["currentUser"] = decode
   next()
 }
