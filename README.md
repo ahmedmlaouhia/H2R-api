@@ -52,23 +52,10 @@ docker-compose --project-name mysql up -d
 npm run dev
 ```
 
-6. Build the project:
-
-```bash
-# Run this command to compile the TypeScript code to JavaScript
-npm run build
-```
-
-## Scripts
-
-- `dev`: Starts the server in development mode with `ts-node`.
-- `build`: Compiles the TypeScript code to JavaScript.
-- `start`: Runs the compiled JavaScript in production.
-
 ## Technologies Used
 
-- **Express**: Web framework
-- **TypeScript**: Type safety
-- **TypeORM**: ORM for database management
-- **MySQL**: Database
-- **Docker**: Containerization
+- **[Express](https://expressjs.com/)**: Web framework for building server-side applications.
+- **[TypeScript](https://www.typescriptlang.org/)**: Provides type safety and advanced tooling for JavaScript.
+- **[TypeORM](https://typeorm.io/)**: ORM for managing database interactions in TypeScript/JavaScript.
+- **[MySQL](https://dev.mysql.com/doc/)**: Relational database management system.
+- **[Docker](https://docs.docker.com/)**: Containerization platform to package and run applications.
