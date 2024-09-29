@@ -13,7 +13,13 @@ export class User extends BaseEntity {
   id: number
 
   @Column({ nullable: false })
-  name: string
+  firstName: string
+
+  @Column({ nullable: false })
+  lastName: string
+
+  @Column({ nullable: false })
+  phone: string
 
   @Column({ nullable: false })
   email: string
