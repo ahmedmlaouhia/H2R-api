@@ -27,9 +27,11 @@ export class AuthController {
           role: user.role,
         })
 
+        const { password: _, createdAt, updatedAt, ...result } = user
+
         return res
           .status(200)
-          .json({ message: "Login successful", user, token })
+          .json({ message: "Login successful", token, result })
       }
     } catch (error) {
       console.error(error)
