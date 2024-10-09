@@ -6,24 +6,17 @@ import { AuthController } from "../controllers/auth.controller"
 
 const router = express.Router()
 router.get("/", auth, authorization(["admin"]), UserController.getUsers)
-router.get(
-  "/profile",
-  auth,
-  authorization(["user", "admin"]),
-  AuthController.getProfile
-)
 router.post("/signup", UserController.signup)
-router.post("/login", AuthController.login)
 router.put(
   "/update/:id",
   auth,
-  authorization(["user", "admin"]),
+  authorization(["user", "HR", "admin"]),
   UserController.updateUser
 )
 router.delete(
   "/delete/:id",
   auth,
-  authorization(["admin"]),
+  authorization(["HR", "admin"]),
   UserController.deleteUser
 )
 

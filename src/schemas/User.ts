@@ -29,22 +29,18 @@ export class User extends BaseEntity {
   @Column({ nullable: false })
   password: string
 
-  @Column({ default: "user" })
+  @Column({ default: "user" }) //user, HR, admin
   role: string
 
   @Column({ nullable: false, default: 20 })
-  leaveBalance: number; 
+  leaveBalance: number
 
-  @OneToMany(() => Leave, (leave) => leave.user)
-  leaves: Leave[];
+  @OneToMany(() => Leave, leave => leave.user)
+  leaves: Leave[]
 
   @CreateDateColumn()
   createdAt: Date
 
   @UpdateDateColumn()
   updatedAt: Date
-
-  
 }
-
-
