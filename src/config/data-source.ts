@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm"
 import { User } from "../schemas/User"
 import "dotenv/config"
+import { Leave } from "../schemas/Leave"
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [User],
+  entities: [User,Leave],
   subscribers: [],
   migrations: [],
 })

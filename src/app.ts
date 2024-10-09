@@ -5,6 +5,7 @@ import { AppDataSource } from "./config/data-source"
 import "dotenv/config"
 import cors from "cors"
 import { errorHandler } from "./middleware/error.middleware"
+import leaveRouter from "./routes/leave.route"
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -14,6 +15,8 @@ app.use(cors())
 
 app.use(express.urlencoded({ extended: true }))
 app.use("/user", userRouter)
+app.use("/leave", leaveRouter);
+
 app.use(errorHandler)
 
 AppDataSource.initialize()
