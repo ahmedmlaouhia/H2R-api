@@ -32,27 +32,49 @@ export class UserController {
       .json({ message: "User created successfully", token, user: result })
   }
 
+  //get leave balance
+  static getMyLeaveBalance(req: any, res: Response) {
+    return res.status(200).json({ data: req.authUser.leaveBalance })
+  }
+
+  //get leave balance by passing user
+  static getLeaveBalance(user: User) {
+    return user.leaveBalance
+  }
+
   //get all users
   static async getAll(req: Request, res: Response) {
     const users = await User.find()
+    const usersData = users.map(user => {
+      const { password, createdAt, updatedAt, ...data } = user
+      return data
+    })
     return res.status(200).json({
-      data: users,
+      data: usersData,
     })
   }
 
   //get users with role user
   static async getUsers(req: Request, res: Response) {
     const users = await User.findBy({ role: "user" })
+    const usersData = users.map(user => {
+      const { password, createdAt, updatedAt, ...data } = user
+      return data
+    })
     return res.status(200).json({
-      data: users,
+      data: usersData,
     })
   }
 
   //get users with role HR
   static async getHR(req: Request, res: Response) {
     const users = await User.findBy({ role: "HR" })
+    const usersData = users.map(user => {
+      const { password, createdAt, updatedAt, ...data } = user
+      return data
+    })
     return res.status(200).json({
-      data: users,
+      data: usersData,
     })
   }
 
@@ -63,7 +85,10 @@ export class UserController {
     if (user) {
       user.role = role
       await User.save(user)
-      res.status(200).json({ message: "updated", user })
+      res.status(200).json({
+        message:
+          "updated " + user.firstName + user.lastName + " role to " + role,
+      })
     } else {
       res.status(404).json("User not found")
     }
@@ -78,7 +103,12 @@ export class UserController {
       user.lastName = lastName
       user.phone = phone
       await User.save(user)
-      res.status(200).json({ message: "udpdate", user })
+      res
+        .status(200)
+        .json({
+          message:
+            "udpdated user " + user.firstName + user.lastName + " profile",
+        })
     } else {
       res.status(404).json("User not found")
     }
