@@ -38,14 +38,4 @@ export class AuthController {
       return res.status(500).json({ message: "Internal server error" })
     }
   }
-
-  static async getProfile(req: any, res: Response) {
-    if (!req["currentUser"]) {
-      return res.status(401).json({ message: "Unauthorized" })
-    }
-    const user = await User.findOneBy({
-      id: req["currentUser"].id,
-    })
-    return res.status(200).json({ ...user, password: undefined })
-  }
 }
