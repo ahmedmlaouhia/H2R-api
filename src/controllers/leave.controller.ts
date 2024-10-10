@@ -67,7 +67,36 @@ export class LeaveController {
     return res.status(200).json({ data: leaves })
   }
 
-  static async acceptLeave(req: Request, res: Response) {
+  //get all leave requests stats
+  static async getLeaveCount(req: Request, res: Response) {
+    const all = await Leave.count()
+    const approved = await Leave.countBy({ status: "Approved" })
+    const rejected = await Leave.countBy({ status: "Rejected" })
+    const pending = await Leave.countBy({ status: "Pending" })
+    const leaves = { all, approved, rejected, pending }
+    return res.status(200).json({ data: leaves })
+  }
+
+  //get leaves stats by user
+  static async getLeaveCountByUser(req: any, res: Response) {
+    const all = await Leave.countBy({ user: req.authUser })
+    const approved = await Leave.countBy({
+      user: req.authUser,
+      status: "Approved",
+    })
+    const rejected = await Leave.countBy({
+      user: req.authUser,
+      status: "Rejected",
+    })
+    const pending = await Leave.countBy({
+      user: req.authUser,
+      status: "Pending",
+    })
+    const leaves = { all, approved, rejected, pending }
+    return res.status(200).json({ data: leaves })
+  }
+
+  static async approveLeave(req: Request, res: Response) {
     const leaveId = Number(req.params)
     const leave = await Leave.findOneBy({ id: leaveId })
     if (!leave) {
@@ -75,6 +104,16 @@ export class LeaveController {
     }
     leave.status = "Approved"
     await Leave.save(leave)
+    //update leave balance
+    const user = leave.user
+    const leaveBalance = UserController.getLeaveBalance(user)
+    const days = Math.ceil(
+      (new Date(leave.endDate).getTime() -
+        new Date(leave.startDate).getTime()) /
+        (1000 * 60 * 60 * 24)
+    )
+    const newleaveBalance = leaveBalance - days
+    await UserController.updateLeaveBalance(user, newleaveBalance)
     return res.status(200)
   }
 

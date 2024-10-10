@@ -3,7 +3,8 @@ import { encrypt } from "../helpers/helpers"
 import { User } from "../schemas/User"
 
 export class UserController {
-  static async signup(req: Request, res: Response) {
+  //create user
+  static async create(req: Request, res: Response) {
     const email = req.body.email
     if (await User.findOneBy({ email: email })) {
       return res.status(400).json({ message: "User already exists" })
@@ -30,16 +31,6 @@ export class UserController {
     return res
       .status(200)
       .json({ message: "User created successfully", token, user: result })
-  }
-
-  //get leave balance
-  static getMyLeaveBalance(req: any, res: Response) {
-    return res.status(200).json({ data: req.authUser.leaveBalance })
-  }
-
-  //get leave balance by passing user
-  static getLeaveBalance(user: User) {
-    return user.leaveBalance
   }
 
   //get all users
@@ -78,6 +69,16 @@ export class UserController {
     })
   }
 
+  static async getSimpleUserCount(req: Request, res: Response) {
+    const userCount = await User.countBy({ role: "user" })
+    return res.status(200).json({ data: userCount })
+  }
+
+  static async getHRCount(req: Request, res: Response) {
+    const HRCount = await User.countBy({ role: "HR" })
+    return res.status(200).json({ data: HRCount })
+  }
+
   static async updateRole(req: Request, res: Response) {
     const id = Number(req.params)
     const { role } = req.body
@@ -103,12 +104,9 @@ export class UserController {
       user.lastName = lastName
       user.phone = phone
       await User.save(user)
-      res
-        .status(200)
-        .json({
-          message:
-            "udpdated user " + user.firstName + user.lastName + " profile",
-        })
+      res.status(200).json({
+        message: "udpdated user " + user.firstName + user.lastName + " profile",
+      })
     } else {
       res.status(404).json("User not found")
     }
@@ -123,5 +121,20 @@ export class UserController {
       await User.remove(user)
       res.status(200).json({ message: "ok" })
     }
+  }
+
+  //get leave balance
+  static getMyLeaveBalance(req: any, res: Response) {
+    return res.status(200).json({ data: req.authUser.leaveBalance })
+  }
+
+  //get leave balance by passing user
+  static getLeaveBalance(user: User) {
+    return user.leaveBalance
+  }
+
+  static async updateLeaveBalance(user: User, newBalance: number) {
+    user.leaveBalance = newBalance
+    await User.save(user)
   }
 }

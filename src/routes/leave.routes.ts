@@ -8,11 +8,20 @@ const router = express.Router()
 router.post("/create", auth, LeaveController.createLeave)
 router.get("/", auth, authorization(["HR", "admin"]), LeaveController.getLeaves)
 router.get("/my", auth, LeaveController.getMyLeaves)
+//getLeaveCount
+router.get(
+  "/stats",
+  auth,
+  authorization(["HR", "admin"]),
+  LeaveController.getLeaveCount
+)
+//getLeaveCountByUser
+router.get("/user/stats", auth, LeaveController.getLeaveCountByUser)
 router.put(
   "/approve/:id",
   auth,
   authorization(["HR", "admin"]),
-  LeaveController.acceptLeave
+  LeaveController.approveLeave
 )
 router.put(
   "/reject/:id",
