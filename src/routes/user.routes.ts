@@ -7,42 +7,44 @@ const router = express.Router()
 router.post(
   "/create",
   auth,
-  authorization(["HR", "admin"]),
+  authorization(["HR", "Admin"]),
   UserController.create
 )
-router.get("/", auth, authorization(["admin"]), UserController.getAll)
+router.get("/", auth, authorization(["Admin"]), UserController.getAll)
 router.get(
-  "/users",
+  "/employees",
   auth,
-  authorization(["HR", "admin"]),
-  UserController.getUsers
+  authorization(["HR", "Admin"]),
+  UserController.getEmployees
 )
 
-router.get("/hr", auth, authorization(["admin"]), UserController.getHR)
+router.get("/hr", auth, authorization(["Admin"]), UserController.getHR)
 router.get(
-  "/users/count",
+  "/employees/count",
   auth,
-  authorization(["HR", "admin"]),
-  UserController.getSimpleUserCount
+  authorization(["HR", "Admin"]),
+  UserController.getEmployeesCount
 )
 router.get(
   "/hr/count",
   auth,
-  authorization(["admin"]),
+  authorization(["Admin"]),
   UserController.getHRCount
 )
+
 router.put(
-  "/makeAdmin/:id",
+  "/makeEmployee/:id",
   auth,
-  authorization(["admin"]),
-  UserController.makeAdmin
+  authorization(["Admin"]),
+  UserController.makeEmployee
 )
-router.put("/makehr/:id", auth, authorization(["admin"]), UserController.makeHR)
+router.put("/makehr/:id", auth, authorization(["Admin"]), UserController.makeHR)
 router.put("/updateProfile", auth, UserController.updateProfile)
+router.put("/update/:id", auth, UserController.updateUser)
 router.delete(
   "/delete/:id",
   auth,
-  authorization(["HR", "admin"]),
+  authorization(["Admin"]),
   UserController.deleteUser
 )
 

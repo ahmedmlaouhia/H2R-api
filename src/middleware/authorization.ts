@@ -4,11 +4,12 @@ import { User } from "../schemas/User"
 export const authorization = (roles: string[]) => {
   return async (req: any, res: Response, next: NextFunction) => {
     const user = await User.findOneBy({
-      id: req["currentUser"].id,
+      id: req["authUser"].id,
     })
-    if (user && !roles.includes(user.role)) {
+    if (!user) return res.status(404).json({ message: "User not found" })
+    if (!roles.includes(user.role))
       return res.status(403).json({ message: "Forbidden" })
-    }
+
     next()
   }
 }

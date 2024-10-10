@@ -78,7 +78,7 @@ export class LeaveController {
   }
 
   //get leaves stats by user
-  static async getLeaveCountByUser(req: any, res: Response) {
+  static async getLeaveCountByEmployee(req: any, res: Response) {
     const all = await Leave.countBy({ user: req.authUser })
     const approved = await Leave.countBy({
       user: req.authUser,

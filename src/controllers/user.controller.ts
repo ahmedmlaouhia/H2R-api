@@ -6,10 +6,16 @@ export class UserController {
   //create user
   static async create(req: Request, res: Response) {
     const email = req.body.email
+    //verify phone number to be numbers only
+    const phone = req.body.phone
+    if (!/^\d+$/.test(phone)) {
+      return res.status(400).json({ message: "Invalid phone number" })
+    }
+
     if (await User.findOneBy({ email: email })) {
       return res.status(400).json({ message: "User already exists" })
     }
-    const { firstName, lastName, phone, password } = req.body
+    const { firstName, lastName, password } = req.body
     const encryptedPassword = await encrypt.encryptpass(password)
     const user = new User()
     user.firstName = firstName
@@ -17,7 +23,7 @@ export class UserController {
     user.email = email
     user.phone = phone
     user.password = encryptedPassword
-    user.role = "user"
+    user.role = "Employee"
 
     await User.save(user)
     const token = encrypt.generateToken({
@@ -33,19 +39,6 @@ export class UserController {
       .json({ message: "User created successfully", token, user: result })
   }
 
-  static async makeAdmin(req: Request, res: Response) {
-    const id = req.params.id
-    const user = await User.findOneBy({ id: Number(id) })
-    if (user) {
-      user.role = "admin"
-      await User.save(user)
-      return res.status(200).json({
-        message: "User " + user.firstName + user.lastName + " is now an admin",
-      })
-    }
-    return res.status(404).json("User not found")
-  }
-
   static async makeHR(req: Request, res: Response) {
     const id = req.params.id
     const user = await User.findOneBy({ id: Number(id) })
@@ -54,6 +47,20 @@ export class UserController {
       await User.save(user)
       return res.status(200).json({
         message: "User " + user.firstName + user.lastName + " is now an HR",
+      })
+    }
+    return res.status(404).json("User not found")
+  }
+
+  static async makeEmployee(req: Request, res: Response) {
+    const id = req.params.id
+    const user = await User.findOneBy({ id: Number(id) })
+    if (user) {
+      user.role = "Employee"
+      await User.save(user)
+      return res.status(200).json({
+        message:
+          "User " + user.firstName + user.lastName + " is now an employee",
       })
     }
     return res.status(404).json("User not found")
@@ -72,8 +79,8 @@ export class UserController {
   }
 
   //get users with role user
-  static async getUsers(req: Request, res: Response) {
-    const users = await User.findBy({ role: "user" })
+  static async getEmployees(req: Request, res: Response) {
+    const users = await User.findBy({ role: "Employee" })
     const usersData = users.map(user => {
       const { password, createdAt, updatedAt, ...data } = user
       return data
@@ -95,8 +102,8 @@ export class UserController {
     })
   }
 
-  static async getSimpleUserCount(req: Request, res: Response) {
-    const userCount = await User.countBy({ role: "user" })
+  static async getEmployeesCount(req: Request, res: Response) {
+    const userCount = await User.countBy({ role: "Employee" })
     return res.status(200).json({ data: userCount })
   }
 
@@ -115,8 +122,24 @@ export class UserController {
       user.phone = phone
       await User.save(user)
       res.status(200).json({
-        message: "udpdated user " + user.firstName + user.lastName + " profile",
+        message: "profile updated successfully",
       })
+    } else {
+      res.status(404).json("User not found")
+    }
+  }
+
+  static async updateUser(req: Request, res: Response) {
+    const id = Number(req.params)
+    const user = await User.findOneBy({ id: id })
+    if (user) {
+      const { firstName, lastName, phone, email } = req.body
+      user.firstName = firstName
+      user.lastName = lastName
+      user.phone = phone
+      user.email = email
+      await User.save(user)
+      res.status(200).json({ message: "User updated successfully" })
     } else {
       res.status(404).json("User not found")
     }

@@ -3,14 +3,9 @@ import * as jwt from "jsonwebtoken"
 import "dotenv/config"
 
 export const auth = (req: any, res: Response, next: NextFunction) => {
-  const header = req.headers.Authorization
-  if (!header) {
-    return res.status(401).json({ message: "header ! " })
-  }
-
-  const token = header.split(" ")[1]
+  const token = req.headers["token"]
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" })
+    return res.status(401).json({ message: "No token provided" })
   }
 
   const decode = jwt.verify(token, process.env.JWT_SECRET || "")

@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   @Column({ nullable: false })
   password: string
 
-  @Column({ default: "user" }) //user, HR, admin
+  @Column({ default: "Employee" }) //Employee, HR, Admin
   role: string
 
   @Column({ nullable: false, default: 20 })
