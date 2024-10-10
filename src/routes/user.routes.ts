@@ -32,11 +32,12 @@ router.get(
   UserController.getHRCount
 )
 router.put(
-  "/role/:id",
+  "/makeAdmin/:id",
   auth,
   authorization(["admin"]),
-  UserController.updateRole
+  UserController.makeAdmin
 )
+router.put("/makehr/:id", auth, authorization(["admin"]), UserController.makeHR)
 router.put("/updateProfile", auth, UserController.updateProfile)
 router.delete(
   "/delete/:id",

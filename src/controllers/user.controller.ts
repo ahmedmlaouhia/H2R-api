@@ -9,7 +9,7 @@ export class UserController {
     if (await User.findOneBy({ email: email })) {
       return res.status(400).json({ message: "User already exists" })
     }
-    const { firstName, lastName, phone, password, role } = req.body
+    const { firstName, lastName, phone, password } = req.body
     const encryptedPassword = await encrypt.encryptpass(password)
     const user = new User()
     user.firstName = firstName
@@ -17,7 +17,7 @@ export class UserController {
     user.email = email
     user.phone = phone
     user.password = encryptedPassword
-    user.role = role
+    user.role = "user"
 
     await User.save(user)
     const token = encrypt.generateToken({
@@ -31,6 +31,32 @@ export class UserController {
     return res
       .status(200)
       .json({ message: "User created successfully", token, user: result })
+  }
+
+  static async makeAdmin(req: Request, res: Response) {
+    const id = req.params.id
+    const user = await User.findOneBy({ id: Number(id) })
+    if (user) {
+      user.role = "admin"
+      await User.save(user)
+      return res.status(200).json({
+        message: "User " + user.firstName + user.lastName + " is now an admin",
+      })
+    }
+    return res.status(404).json("User not found")
+  }
+
+  static async makeHR(req: Request, res: Response) {
+    const id = req.params.id
+    const user = await User.findOneBy({ id: Number(id) })
+    if (user) {
+      user.role = "HR"
+      await User.save(user)
+      return res.status(200).json({
+        message: "User " + user.firstName + user.lastName + " is now an HR",
+      })
+    }
+    return res.status(404).json("User not found")
   }
 
   //get all users
@@ -77,22 +103,6 @@ export class UserController {
   static async getHRCount(req: Request, res: Response) {
     const HRCount = await User.countBy({ role: "HR" })
     return res.status(200).json({ data: HRCount })
-  }
-
-  static async updateRole(req: Request, res: Response) {
-    const id = Number(req.params)
-    const { role } = req.body
-    const user = await User.findOneBy({ id: id })
-    if (user) {
-      user.role = role
-      await User.save(user)
-      res.status(200).json({
-        message:
-          "updated " + user.firstName + user.lastName + " role to " + role,
-      })
-    } else {
-      res.status(404).json("User not found")
-    }
   }
 
   static async updateProfile(req: any, res: Response) {
