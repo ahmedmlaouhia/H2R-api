@@ -5,28 +5,19 @@ import { LeaveController } from "../controllers/leave.controller"
 
 const router = express.Router()
 
-router.post(
-  "/create",
-  auth,
-  authorization(["user", "HR", "admin"]),
-  LeaveController.createLeave
-)
-router.get(
-  "/",
-  auth,
-  authorization(["user", "HR", "admin"]),
-  LeaveController.getLeaves
-)
+router.post("/create", auth, LeaveController.createLeave)
+router.get("/", auth, authorization(["HR", "admin"]), LeaveController.getLeaves)
+router.get("/my", auth, LeaveController.getMyLeaves)
 router.put(
   "/approve/:id",
   auth,
-  authorization(["admin"]),
+  authorization(["HR", "admin"]),
   LeaveController.acceptLeave
 )
 router.put(
   "/reject/:id",
   auth,
-  authorization(["admin"]),
+  authorization(["HR", "admin"]),
   LeaveController.refuseLeave
 )
 

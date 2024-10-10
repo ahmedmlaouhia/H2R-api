@@ -32,23 +32,51 @@ export class UserController {
       .json({ message: "User created successfully", token, user: result })
   }
 
-  static async getUsers(req: Request, res: Response) {
+  //get all users
+  static async getAll(req: Request, res: Response) {
     const users = await User.find()
     return res.status(200).json({
       data: users,
     })
   }
 
-  static async updateUser(req: Request, res: Response) {
+  //get users with role user
+  static async getUsers(req: Request, res: Response) {
+    const users = await User.findBy({ role: "user" })
+    return res.status(200).json({
+      data: users,
+    })
+  }
+
+  //get users with role HR
+  static async getHR(req: Request, res: Response) {
+    const users = await User.findBy({ role: "HR" })
+    return res.status(200).json({
+      data: users,
+    })
+  }
+
+  static async updateRole(req: Request, res: Response) {
     const id = Number(req.params)
-    const { firstName, lastName, email, phone, role } = req.body
+    const { role } = req.body
+    const user = await User.findOneBy({ id: id })
+    if (user) {
+      user.role = role
+      await User.save(user)
+      res.status(200).json({ message: "updated", user })
+    } else {
+      res.status(404).json("User not found")
+    }
+  }
+
+  static async updateProfile(req: any, res: Response) {
+    const id = req.authUser.id
+    const { firstName, lastName, phone } = req.body
     const user = await User.findOneBy({ id: id })
     if (user) {
       user.firstName = firstName
       user.lastName = lastName
       user.phone = phone
-      user.email = email
-      user.role = role
       await User.save(user)
       res.status(200).json({ message: "udpdate", user })
     } else {
