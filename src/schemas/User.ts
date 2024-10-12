@@ -12,7 +12,7 @@ import { Leave } from "./Leave"
 @Entity({ name: "users" })
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: number
+  id: string
 
   @Column({ nullable: false })
   firstName: string

@@ -41,7 +41,7 @@ export class UserController {
 
   static async makeHR(req: Request, res: Response) {
     const id = req.params.id
-    const user = await User.findOneBy({ id: Number(id) })
+    const user = await User.findOneBy({ id: id })
     if (user) {
       user.role = "HR"
       await User.save(user)
@@ -54,7 +54,7 @@ export class UserController {
 
   static async makeEmployee(req: Request, res: Response) {
     const id = req.params.id
-    const user = await User.findOneBy({ id: Number(id) })
+    const user = await User.findOneBy({ id: id })
     if (user) {
       user.role = "Employee"
       await User.save(user)
@@ -130,7 +130,7 @@ export class UserController {
   }
 
   static async updateUser(req: Request, res: Response) {
-    const id = Number(req.params)
+    const id = req.params.id
     const user = await User.findOneBy({ id: id })
     if (user) {
       const { firstName, lastName, phone, email } = req.body
@@ -146,7 +146,7 @@ export class UserController {
   }
 
   static async deleteUser(req: Request, res: Response) {
-    const id = Number(req.params)
+    const id = req.params.id
     const user = await User.findOneBy({
       id: id,
     })

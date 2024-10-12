@@ -40,7 +40,12 @@ router.put(
 )
 router.put("/makehr/:id", auth, authorization(["Admin"]), UserController.makeHR)
 router.put("/updateProfile", auth, UserController.updateProfile)
-router.put("/update/:id", auth, UserController.updateUser)
+router.put(
+  "/update/:id",
+  auth,
+  authorization(["Admin"]),
+  UserController.updateUser
+)
 router.delete(
   "/delete/:id",
   auth,
