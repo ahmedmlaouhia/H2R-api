@@ -68,7 +68,7 @@ export class LeaveController {
     const leaves = await Leave.find({
       where: { user },
     })
-    return res.status(200).json({ data: leaves })
+    return res.status(200).json({ leaves: leaves })
   }
 
   //get all leave requests stats
