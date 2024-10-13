@@ -133,7 +133,14 @@ export class UserController {
     const id = req.params.id
     const user = await User.findOneBy({ id: id })
     if (user) {
-      const { firstName, lastName, phone, email } = req.body
+      const { email } = req.body
+      const existEmail = await User.findOneBy({
+        email: email,
+      })
+      if (existEmail && existEmail.id !== user.id) {
+        return res.status(400).json({ message: "Email already exists" })
+      }
+      const { firstName, lastName, phone } = req.body
       user.firstName = firstName
       user.lastName = lastName
       user.phone = phone
