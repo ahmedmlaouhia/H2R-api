@@ -23,13 +23,11 @@ export class LeaveController {
           message: "You already have a leave request for the same date range",
         })
 
-      //check check leave balance
-      const leaveBalance = UserController.getLeaveBalance(user)
       const days = Math.ceil(
         (new Date(endDate).getTime() - new Date(startDate).getTime()) /
           (1000 * 60 * 60 * 24)
       )
-      if (days > leaveBalance)
+      if (days > user.leaveBalance)
         return res.status(400).json({
           message: "Insufficient leave balance",
         })
@@ -41,7 +39,9 @@ export class LeaveController {
       leave.reason = reason
       leave.user = user
       await Leave.save(leave)
-      return res.status(201).json({ data: leave })
+      return res
+        .status(201)
+        .json({ message: "Leave request created successfully" })
     } catch (error) {
       return res.status(500).json({ message: "Internal server error", error })
     }
@@ -52,8 +52,12 @@ export class LeaveController {
       const leaves = await Leave.find({
         relations: ["user"],
       })
-
-      return res.status(200).json({ data: leaves })
+      const data = leaves.map(leave => {
+        const { user, ...rest } = leave
+        const { password: _, createdAt, updatedAt, ...result } = user
+        return { ...rest, user: result }
+      })
+      return res.status(200).json({ leaves: data })
     } catch (error) {
       return res.status(500).json({ message: "Internal server error", error })
     }
@@ -97,36 +101,52 @@ export class LeaveController {
   }
 
   static async approveLeave(req: Request, res: Response) {
-    const leaveId = Number(req.params)
-    const leave = await Leave.findOneBy({ id: leaveId })
+    const leaveId = req.params.id
+    //find leave request by id and get user too
+    const leave = await Leave.findOne({
+      where: { id: leaveId },
+      relations: ["user"],
+    })
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-    leave.status = "Approved"
-    await Leave.save(leave)
-    //update leave balance
+    //check if the leave request is pending
+    if (leave.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ message: "Leave request is already " + leave.status })
+    }
     const user = leave.user
-    const leaveBalance = UserController.getLeaveBalance(user)
     const days = Math.ceil(
       (new Date(leave.endDate).getTime() -
         new Date(leave.startDate).getTime()) /
         (1000 * 60 * 60 * 24)
     )
-    const newleaveBalance = leaveBalance - days
+    if (days > leave.user.leaveBalance) {
+      return res.status(400).json({ message: "Insufficient leave balance" })
+    }
+    leave.status = "Approved"
+    await Leave.save(leave)
+    const newleaveBalance = user.leaveBalance - days
     await UserController.updateLeaveBalance(user, newleaveBalance)
-    return res.status(200)
+    return res.status(200).json({ message: "Leave request approved" })
   }
 
   static async refuseLeave(req: Request, res: Response) {
-    const leaveId = Number(req.params)
+    const leaveId = req.params.id
     const leave = await Leave.findOneBy({ id: leaveId })
 
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-
+    //check if the leave request is pending
+    if (leave.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ message: "Leave request is already " + leave.status })
+    }
     leave.status = "Rejected"
     await Leave.save(leave)
-    return res.status(200)
+    return res.status(200).json({ message: "Leave request rejected" })
   }
 }

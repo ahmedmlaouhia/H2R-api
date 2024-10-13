@@ -12,7 +12,7 @@ import { User } from "./User"
 @Entity({ name: "leaves" })
 export class Leave extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: number
+  id: string
 
   @ManyToOne(() => User, user => user.leaves)
   user: User
@@ -23,8 +23,8 @@ export class Leave extends BaseEntity {
   @Column({ nullable: false })
   endDate: Date
 
-  @Column({ nullable: false, default: "pending" })
-  status: string // pending, approved, rejected
+  @Column({ nullable: false, default: "Pending" })
+  status: string // Pending, Approved, Rejected, Canceled
 
   @Column({ nullable: false })
   reason: string

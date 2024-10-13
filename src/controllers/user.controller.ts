@@ -24,14 +24,17 @@ export class UserController {
     user.phone = phone
     user.password = encryptedPassword
     user.role = "Employee"
+    user.leaveBalance = 20
 
     await User.save(user)
     const token = encrypt.generateToken({
+      id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phone: user.phone,
       email: user.email,
       role: user.role,
+      leaveBalance: user.leaveBalance,
     })
     const { password: _, createdAt, updatedAt, ...result } = user
     return res
@@ -166,11 +169,6 @@ export class UserController {
   //get leave balance
   static getMyLeaveBalance(req: any, res: Response) {
     return res.status(200).json({ data: req.authUser.leaveBalance })
-  }
-
-  //get leave balance by passing user
-  static getLeaveBalance(user: User) {
-    return user.leaveBalance
   }
 
   static async updateLeaveBalance(user: User, newBalance: number) {
