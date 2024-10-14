@@ -81,6 +81,12 @@ export class UserController {
     })
   }
 
+  //get user by id
+  static async getUserById(id: string) {
+    const user = await User.findOneBy({ id: id })
+    return user
+  }
+
   //get users with role user
   static async getEmployees(req: Request, res: Response) {
     const users = await User.findBy({ role: "Employee" })
@@ -167,8 +173,14 @@ export class UserController {
   }
 
   //get leave balance
-  static getMyLeaveBalance(req: any, res: Response) {
-    return res.status(200).json({ data: req.authUser.leaveBalance })
+  static async getMyLeaveBalance(req: any, res: Response) {
+    const id = req.authUser.id
+    const user = await User.findOneBy({
+      id: id,
+    })
+    if (user) {
+      return res.status(200).json({ leaveBalance: user.leaveBalance })
+    }
   }
 
   static async updateLeaveBalance(user: User, newBalance: number) {

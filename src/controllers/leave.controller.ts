@@ -1,27 +1,30 @@
 import { Response, Request } from "express"
 import { Leave } from "../schemas/Leave"
 import { UserController } from "./user.controller"
+import { User } from "../schemas/User"
 
 export class LeaveController {
   static async createLeave(req: any, res: Response) {
     try {
       const { startDate, endDate, reason } = req.body
-
-      //check the date
+      if (!startDate || !endDate || !reason) {
+        return res
+          .status(400)
+          .json({ message: "startDate, endDate and reason are required" })
+      }
       if (new Date(startDate) > new Date(endDate))
         return res.status(400).json({ message: "Invalid date range" })
-
-      //check if the user has a leave request for the same date range
       const user = req.authUser
-      const leaveRequest = await Leave.findOneBy({
-        user,
-        startDate,
-        endDate,
-      })
-      if (leaveRequest)
-        return res.status(400).json({
-          message: "You already have a leave request for the same date range",
-        })
+      // const leaveRequest = await Leave.findOneBy({
+      //   user,
+      //   startDate,
+      //   endDate,
+      // })
+      // console.log(user.leaveBalance)
+      // if (leaveRequest)
+      //   return res.status(400).json({
+      //     message: "You already have a leave request for the same date range",
+      //   })
 
       const days = Math.ceil(
         (new Date(endDate).getTime() - new Date(startDate).getTime()) /
@@ -64,11 +67,17 @@ export class LeaveController {
   }
 
   static async getMyLeaves(req: any, res: Response) {
-    const user = req.authUser
-    const leaves = await Leave.find({
-      where: { user },
+    const id = req.authUser.id
+    const user = await User.findOne({
+      where: { id: id },
+      relations: {
+        leaves: true,
+      },
     })
-    return res.status(200).json({ leaves: leaves })
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+    return res.status(200).json({ leaves: user.leaves })
   }
 
   //get all leave requests stats
