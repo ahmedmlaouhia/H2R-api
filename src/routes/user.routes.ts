@@ -4,12 +4,8 @@ import { auth } from "../middleware/auth.middleware"
 import { authorization } from "../middleware/authorization"
 
 const router = express.Router()
-router.post(
-  "/create",
-  auth,
-  authorization(["HR", "Admin"]),
-  UserController.create
-)
+router.post("/create", UserController.create)
+router.post("/add", UserController.addUser)
 router.get("/", auth, authorization(["Admin"]), UserController.getAll)
 router.get(
   "/employees",

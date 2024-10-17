@@ -27,19 +27,37 @@ export class UserController {
     user.leaveBalance = 20
 
     await User.save(user)
-    const token = encrypt.generateToken({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      email: user.email,
-      role: user.role,
-      leaveBalance: user.leaveBalance,
-    })
+
     const { password: _, createdAt, updatedAt, ...result } = user
     return res
       .status(200)
-      .json({ message: "User created successfully", token, user: result })
+      .json({ message: "User created successfully", user: result })
+  }
+
+  static async addUser(req: Request, res: Response) {
+    const email = req.body.email
+    //verify phone number to be numbers only
+    const phone = req.body.phone
+    if (!/^\d+$/.test(phone)) {
+      return res.status(400).json({ message: "Invalid phone number" })
+    }
+
+    if (await User.findOneBy({ email: email })) {
+      return res.status(400).json({ message: "User already exists" })
+    }
+    const { firstName, lastName, password } = req.body
+    const encryptedPassword = await encrypt.encryptpass(password)
+    const user = new User()
+    user.firstName = firstName
+    user.lastName = lastName
+    user.email = email
+    user.phone = phone
+    user.password = encryptedPassword
+    user.role = "Employee"
+    user.leaveBalance = 20
+
+    await User.save(user)
+    return res.status(200).json({ message: "User created successfully" })
   }
 
   static async makeHR(req: Request, res: Response) {

@@ -14,37 +14,44 @@ export class LeaveController {
       }
       if (new Date(startDate) > new Date(endDate))
         return res.status(400).json({ message: "Invalid date range" })
-      const user = req.authUser
-      // const leaveRequest = await Leave.findOneBy({
-      //   user,
-      //   startDate,
-      //   endDate,
-      // })
-      // console.log(user.leaveBalance)
-      // if (leaveRequest)
-      //   return res.status(400).json({
-      //     message: "You already have a leave request for the same date range",
-      //   })
+      const userid = req.authUser.id
+      const user = await User.findOneBy({ id: userid })
+      if (!user) {
+        res.status(404).json({ message: "user not found" })
+      } else {
+        // const leaveRequest = await Leave.findOneBy({
+        //   user,
+        //   startDate,
+        //   endDate,
+        // })
+        // console.log(user.leaveBalance)
+        // if (leaveRequest)
+        //   return res.status(400).json({
+        //     message: "You already have a leave request for the same date range",
+        //   })
 
-      const days = Math.ceil(
-        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
-      if (days > user.leaveBalance)
-        return res.status(400).json({
-          message: "Insufficient leave balance",
-        })
+        const days =
+          Math.ceil(
+            (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+              (1000 * 3600 * 24)
+          ) + 1
+        if (days > user.leaveBalance)
+          return res.status(400).json({
+            message: "Insufficient leave balance",
+          })
 
-      //create a new leave request
-      const leave = new Leave()
-      leave.startDate = startDate
-      leave.endDate = endDate
-      leave.reason = reason
-      leave.user = user
-      await Leave.save(leave)
-      return res
-        .status(201)
-        .json({ message: "Leave request created successfully" })
+        //create a new leave request
+        const leave = new Leave()
+        leave.startDate = startDate
+        leave.endDate = endDate
+        leave.reason = reason
+        leave.user = user
+        await Leave.save(leave)
+
+        return res
+          .status(201)
+          .json({ message: "Leave request created successfully" })
+      }
     } catch (error) {
       return res.status(500).json({ message: "Internal server error", error })
     }
