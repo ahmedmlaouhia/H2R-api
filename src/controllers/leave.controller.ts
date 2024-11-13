@@ -165,4 +165,64 @@ export class LeaveController {
     await Leave.save(leave)
     return res.status(200).json({ message: "Leave request rejected" })
   }
+
+  static async cancelLeave(req: Request, res: Response) {
+    const leaveId = req.params.id
+    const leave = await Leave.findOneBy({ id: leaveId })
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave request not found" })
+    }
+    //check if the leave request is pending
+    if (leave.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ message: "Leave request is already " + leave.status })
+    }
+    await Leave.remove(leave)
+    return res.status(200).json({ message: "Leave request cancelled" })
+  }
+
+  static async editLeave(req: Request, res: Response) {
+    const leaveId = req.params.id
+    const leave = await Leave.findOneBy({ id: leaveId })
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave request not found" })
+    }
+    //check if the leave request is pending
+    const user = await User.findOneBy({ id: leave.user.id })
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    if (leave.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ message: "Leave request is already " + leave.status })
+    }
+    const { startDate, endDate, reason } = req.body
+    if (!startDate || !endDate || !reason) {
+      return res
+        .status(400)
+        .json({ message: "startDate, endDate and reason are required" })
+    }
+    const days =
+      Math.ceil(
+        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+          (1000 * 3600 * 24)
+      ) + 1
+    if (days > user.leaveBalance)
+      return res.status(400).json({
+        message: "Insufficient leave balance",
+      })
+    if (new Date(startDate) > new Date(endDate))
+      return res.status(400).json({ message: "Invalid date range" })
+
+    leave.startDate = startDate
+    leave.endDate = endDate
+    leave.reason = reason
+    await Leave.save(leave)
+    return res.status(200).json({ message: "Leave request updated" })
+  }
 }

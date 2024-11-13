@@ -30,4 +30,18 @@ router.put(
   LeaveController.refuseLeave
 )
 
+router.put(
+  "/cancel/:id",
+  auth,
+  authorization(["Employee"]),
+  LeaveController.cancelLeave
+)
+
+router.put(
+  "/edit/:id",
+  auth,
+  authorization(["Employee"]),
+  LeaveController.editLeave
+)
+
 export default router
