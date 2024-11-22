@@ -2,6 +2,7 @@ import { Response, Request } from "express"
 import { Leave } from "../schemas/Leave"
 import { UserController } from "./user.controller"
 import { User } from "../schemas/User"
+import moment from "moment"
 
 export class LeaveController {
   static async createLeave(req: any, res: Response) {
@@ -133,11 +134,7 @@ export class LeaveController {
         .json({ message: "Leave request is already " + leave.status })
     }
     const user = leave.user
-    const days = Math.ceil(
-      (new Date(leave.endDate).getTime() -
-        new Date(leave.startDate).getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
+    const days = moment(leave.endDate).diff(moment(leave.startDate), "days") + 1
     if (days > leave.user.leaveBalance) {
       return res.status(400).json({ message: "Insufficient leave balance" })
     }
@@ -185,7 +182,10 @@ export class LeaveController {
 
   static async editLeave(req: Request, res: Response) {
     const leaveId = req.params.id
-    const leave = await Leave.findOneBy({ id: leaveId })
+    const leave = await Leave.findOne({
+      where: { id: leaveId },
+      relations: ["user"],
+    })
 
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
