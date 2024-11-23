@@ -7,6 +7,7 @@ import "dotenv/config"
 import cors from "cors"
 import { errorHandler } from "./middleware/error.middleware"
 import leaveRouter from "./routes/leave.routes"
+import timesheetRouter from "./routes/timesheet.routes"
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/auth", authRouter)
 app.use("/user", userRouter)
 app.use("/leave", leaveRouter)
+app.use("/timesheets", timesheetRouter)
 
 app.use(errorHandler)
 

@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from "typeorm"
 import { Leave } from "./Leave"
+import { Timesheet } from "./Timesheet"
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
@@ -37,6 +38,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Leave, leave => leave.user)
   leaves: Leave[]
+
+  @OneToMany(() => Timesheet, timesheet => timesheet.user)
+  timesheets: Timesheet[]
 
   @CreateDateColumn()
   createdAt: Date
