@@ -43,7 +43,7 @@ router.put(
 router.put(
   "/edit/:id",
   auth,
-  authorization(["Employee"]),
+  authorization(["Employee", "HR", "Admin"]),
   TimesheetController.editTimesheetEntry
 )
 
