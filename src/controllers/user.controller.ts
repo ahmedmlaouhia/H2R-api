@@ -147,16 +147,22 @@ export class UserController {
 
   static async updateProfile(req: any, res: Response) {
     const id = req.authUser.id
-    const { firstName, lastName, phone } = req.body
     const user = await User.findOneBy({ id: id })
     if (user) {
+      const { email } = req.body
+      const existEmail = await User.findOneBy({
+        email: email,
+      })
+      if (existEmail && existEmail.id !== user.id) {
+        return res.status(400).json({ message: "Email already exists" })
+      }
+      const { firstName, lastName, phone } = req.body
       user.firstName = firstName
       user.lastName = lastName
       user.phone = phone
+      user.email = email
       await User.save(user)
-      res.status(200).json({
-        message: "profile updated successfully",
-      })
+      res.status(200).json({ message: "User updated successfully" })
     } else {
       res.status(404).json("User not found")
     }
