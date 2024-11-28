@@ -7,6 +7,7 @@ const router = express.Router()
 router.post("/create", UserController.create)
 router.post("/add", UserController.addUser)
 router.get("/", auth, authorization(["Admin"]), UserController.getAll)
+router.get("/me", auth, UserController.getUserById)
 router.get(
   "/employees",
   auth,
@@ -36,12 +37,7 @@ router.put(
 )
 router.put("/makehr/:id", auth, authorization(["Admin"]), UserController.makeHR)
 router.put("/updateProfile", auth, UserController.updateProfile)
-router.put(
-  "/update/:id",
-  auth,
-  authorization(["Admin"]),
-  UserController.updateUser
-)
+router.put("/updatePassword", auth, UserController.updatePassword)
 router.delete(
   "/delete/:id",
   auth,

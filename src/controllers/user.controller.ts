@@ -100,9 +100,15 @@ export class UserController {
   }
 
   //get user by id
-  static async getUserById(id: string) {
-    const user = await User.findOneBy({ id: id })
-    return user
+  static async getUserById(req: any, res: Response) {
+    const user = await User.findOneBy({
+      id: req.authUser.id,
+    })
+    if (user) {
+      const { password, createdAt, updatedAt, ...result } = user
+      return res.status(200).json({ data: result })
+    }
+    return res.status(404).json("User not found")
   }
 
   //get users with role user
@@ -156,27 +162,26 @@ export class UserController {
     }
   }
 
-  static async updateUser(req: Request, res: Response) {
-    const id = req.params.id
+  static async updatePassword(req: any, res: Response) {
+    const id = req.authUser.id
+    const { oldPassword, newPassword } = req.body
     const user = await User.findOneBy({ id: id })
     if (user) {
-      const { email } = req.body
-      const existEmail = await User.findOneBy({
-        email: email,
-      })
-      if (existEmail && existEmail.id !== user.id) {
-        return res.status(400).json({ message: "Email already exists" })
+      const isPasswordValid = await encrypt.comparepassword(
+        user.password,
+        oldPassword
+      )
+      if (isPasswordValid) {
+        const encryptedPassword = await encrypt.encryptpass(newPassword)
+        user.password = encryptedPassword
+        await User.save(user)
+        return res
+          .status(200)
+          .json({ message: "Password updated successfully" })
       }
-      const { firstName, lastName, phone } = req.body
-      user.firstName = firstName
-      user.lastName = lastName
-      user.phone = phone
-      user.email = email
-      await User.save(user)
-      res.status(200).json({ message: "User updated successfully" })
-    } else {
-      res.status(404).json("User not found")
+      return res.status(400).json({ message: "Invalid password" })
     }
+    return res.status(404).json("User not found")
   }
 
   static async deleteUser(req: Request, res: Response) {
