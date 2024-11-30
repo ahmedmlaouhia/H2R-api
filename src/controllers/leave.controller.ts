@@ -58,6 +58,17 @@ export class LeaveController {
     }
   }
 
+  static async getUserId(leaveId: string) {
+    const leave = await Leave.findOne({
+      where: { id: leaveId },
+      relations: ["user"],
+    })
+    if (!leave) {
+      return null
+    }
+    return leave.user.id
+  }
+
   static async getLeaves(req: Request, res: Response) {
     try {
       const leaves = await Leave.find({
