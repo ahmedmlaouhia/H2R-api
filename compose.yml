@@ -1,10 +1,28 @@
 services:
-  mysql:
+  h2r:
+    image: 381491905102.dkr.ecr.us-east-1.amazonaws.com/bohmid/h2r:v1
+    container_name: h2r
+    ports:
+      - "5000:80"
+    restart: always
+    depends_on:
+      - h2r-api
+
+  h2r-api:
+    image: 381491905102.dkr.ecr.us-east-1.amazonaws.com/bohmid/h2r-backend:v1
+    container_name: h2r-api
+    ports:
+      - "5001:3000"
+    restart: always
+    depends_on:
+      - h2r-db
+
+  h2r-db:
     container_name: mysql
     image: mysql:8.3.0
     restart: always
     volumes:
-      - mysql-volume:/var/lib/mysql
+      - h2r-db-volume:/var/lib/mysql
     environment:
       MYSQL_DATABASE: h2r
       MYSQL_ROOT_PASSWORD: h2r@123456
@@ -18,7 +36,9 @@ services:
       - "8088:80"
     restart: always
     environment:
-      PMA_HOST: mysql
+      PMA_HOST: h2r-db
+    depends_on:
+      - h2r-db
 
 volumes:
-  mysql-volume:
+  h2r-db-volume:
