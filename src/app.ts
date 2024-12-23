@@ -27,6 +27,7 @@ io.on("connection", socket => {
   socket.on("join", (userId: any) => {
     connectedUsers.set(userId, socket.id)
     console.log(connectedUsers)
+    io.to(socket.id).emit("connected")
   })
   socket.on("leaveApproved", (leaveId: string) => {
     LeaveController.getUserId(leaveId).then(userId => {
