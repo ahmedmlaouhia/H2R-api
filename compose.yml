@@ -16,6 +16,14 @@ services:
     restart: always
     depends_on:
       - h2r-db
+    environment:
+      DB_HOST: h2r-db
+      DB_USER: root
+      DB_PASSWORD: h2r@123456
+      DB_NAME: h2r
+      DB_PORT: 3306
+      PORT: 3000
+      JWT_SECRET: 9bd113df7c98d986e606966f910c9e2c80a28027320ff07d2a8a0897a2233e4e
 
   h2r-db:
     container_name: mysql
