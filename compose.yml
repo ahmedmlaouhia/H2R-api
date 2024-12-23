@@ -8,7 +8,7 @@ services:
     depends_on:
       - h2r-api
 
-  backend:
+  h2r-api:
     image: 381491905102.dkr.ecr.us-east-1.amazonaws.com/bohmid/h2r-backend:v1
     container_name: h2r-api
     ports:
