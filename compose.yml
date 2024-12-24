@@ -7,6 +7,8 @@ services:
     restart: always
     depends_on:
       - h2r-api
+    networks:
+      - prometheus
 
   h2r-api:
     image: 381491905102.dkr.ecr.us-east-1.amazonaws.com/bohmid/h2r-backend:v1
@@ -47,6 +49,13 @@ services:
       PMA_HOST: h2r-db
     depends_on:
       - h2r-db
+    networks:
+      - prometheus
+
+networks:
+  prometheus:
+    name: prometheus
+    external: true
 
 volumes:
   h2r-db-volume:
