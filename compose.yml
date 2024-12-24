@@ -18,6 +18,8 @@ services:
     restart: always
     depends_on:
       - h2r-db
+    networks:
+      - prometheus
     environment:
       DB_HOST: h2r-db
       DB_USER: root
@@ -38,6 +40,8 @@ services:
       MYSQL_ROOT_PASSWORD: h2r@123456
     ports:
       - 3306:3306
+    networks:
+      - prometheus
 
   phpmyadmin:
     container_name: phpmyadmin
