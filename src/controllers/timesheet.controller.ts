@@ -80,15 +80,14 @@ export class TimesheetController {
         .json({ message: "Timesheet is already " + timesheet.status })
     }
 
-    // Update the timesheet status (e.g., Approved or Rejected)
-    timesheet.status = "Approved" // Change this logic as per your requirement
+    timesheet.status = "Approved"
     await Timesheet.save(timesheet)
 
     // Create a notification for the user
     const notification = new Notification()
     notification.user = timesheet.user
-    notification.title = "Timesheet Approved" // Adjust the title based on your logic
-    notification.message = `Your timesheet entry for ${timesheet.date} has been approved.` // Adjust the message
+    notification.title = "Timesheet Approved"
+    notification.message = `Your timesheet entry for ${timesheet.date} has been approved.`
     await Notification.save(notification)
 
     return res
