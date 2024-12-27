@@ -1,6 +1,7 @@
 import { Response, Request } from "express"
 import { Timesheet } from "../schemas/Timesheet"
 import { User } from "../schemas/User"
+import { Notification } from "../schemas/Notification"
 
 export class TimesheetController {
   static async createTimesheetEntry(req: any, res: Response) {
@@ -79,10 +80,20 @@ export class TimesheetController {
         .json({ message: "Timesheet is already " + timesheet.status })
     }
 
-    timesheet.status = "Approved"
+    // Update the timesheet status (e.g., Approved or Rejected)
+    timesheet.status = "Approved" // Change this logic as per your requirement
     await Timesheet.save(timesheet)
 
-    return res.status(200).json({ message: "Timesheet entry approved" })
+    // Create a notification for the user
+    const notification = new Notification()
+    notification.user = timesheet.user
+    notification.title = "Timesheet Approved" // Adjust the title based on your logic
+    notification.message = `Your timesheet entry for ${timesheet.date} has been approved.` // Adjust the message
+    await Notification.save(notification)
+
+    return res
+      .status(200)
+      .json({ message: "Timesheet entry validated successfully" })
   }
 
   static async correctTimesheetEntry(req: Request, res: Response) {

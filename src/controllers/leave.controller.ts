@@ -2,6 +2,7 @@ import { Response, Request } from "express"
 import { Leave } from "../schemas/Leave"
 import { UserController } from "./user.controller"
 import { User } from "../schemas/User"
+import { Notification } from "../schemas/Notification"
 import moment from "moment"
 
 export class LeaveController {
@@ -18,19 +19,8 @@ export class LeaveController {
       const userid = req.authUser.id
       const user = await User.findOneBy({ id: userid })
       if (!user) {
-        res.status(404).json({ message: "user not found" })
+        res.status(404).json({ message: "User not found" })
       } else {
-        // const leaveRequest = await Leave.findOneBy({
-        //   user,
-        //   startDate,
-        //   endDate,
-        // })
-        // console.log(user.leaveBalance)
-        // if (leaveRequest)
-        //   return res.status(400).json({
-        //     message: "You already have a leave request for the same date range",
-        //   })
-
         const days =
           Math.ceil(
             (new Date(endDate).getTime() - new Date(startDate).getTime()) /
@@ -41,7 +31,7 @@ export class LeaveController {
             message: "Insufficient leave balance",
           })
 
-        //create a new leave request
+        // Create a new leave request
         const leave = new Leave()
         leave.startDate = startDate
         leave.endDate = endDate
@@ -99,7 +89,6 @@ export class LeaveController {
     return res.status(200).json({ leaves: user.leaves })
   }
 
-  //get all leave requests stats
   static async getLeaveCount(req: Request, res: Response) {
     const all = await Leave.count()
     const approved = await Leave.countBy({ status: "Approved" })
@@ -109,7 +98,6 @@ export class LeaveController {
     return res.status(200).json({ data: leaves })
   }
 
-  //get leaves stats by user
   static async getLeaveCountByEmployee(req: any, res: Response) {
     const all = await Leave.countBy({ user: req.authUser })
     const approved = await Leave.countBy({
@@ -130,7 +118,6 @@ export class LeaveController {
 
   static async approveLeave(req: Request, res: Response) {
     const leaveId = req.params.id
-    //find leave request by id and get user too
     const leave = await Leave.findOne({
       where: { id: leaveId },
       relations: ["user"],
@@ -138,11 +125,10 @@ export class LeaveController {
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-    //check if the leave request is pending
     if (leave.status !== "Pending") {
       return res
         .status(400)
-        .json({ message: "Leave request is already " + leave.status })
+        .json({ message: `Leave request is already ${leave.status}` })
     }
     const user = leave.user
     const days = moment(leave.endDate).diff(moment(leave.startDate), "days") + 1
@@ -151,8 +137,16 @@ export class LeaveController {
     }
     leave.status = "Approved"
     await Leave.save(leave)
-    const newleaveBalance = user.leaveBalance - days
-    await UserController.updateLeaveBalance(user, newleaveBalance)
+    const newLeaveBalance = user.leaveBalance - days
+    await UserController.updateLeaveBalance(user, newLeaveBalance)
+
+    // Create a notification for the user
+    // const notification = new Notification()
+    // notification.user = leave.user
+    // notification.title = "Leave Approved"
+    // notification.message = `Your leave from ${leave.startDate} to ${leave.endDate} has been approved.`
+    // await Notification.save(notification)
+
     return res.status(200).json({ message: "Leave request approved" })
   }
 
@@ -163,14 +157,21 @@ export class LeaveController {
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-    //check if the leave request is pending
     if (leave.status !== "Pending") {
       return res
         .status(400)
-        .json({ message: "Leave request is already " + leave.status })
+        .json({ message: `Leave request is already ${leave.status}` })
     }
     leave.status = "Rejected"
     await Leave.save(leave)
+
+    // Create a notification for the user
+    // const notification = new Notification()
+    // notification.user = leave.user
+    // notification.title = "Leave Rejected"
+    // notification.message = `Your leave from ${leave.startDate} to ${leave.endDate} has been rejected.`
+    // await Notification.save(notification)
+
     return res.status(200).json({ message: "Leave request rejected" })
   }
 
@@ -181,11 +182,10 @@ export class LeaveController {
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-    //check if the leave request is pending
     if (leave.status !== "Pending") {
       return res
         .status(400)
-        .json({ message: "Leave request is already " + leave.status })
+        .json({ message: `Leave request is already ${leave.status}` })
     }
     await Leave.remove(leave)
     return res.status(200).json({ message: "Leave request cancelled" })
@@ -201,7 +201,6 @@ export class LeaveController {
     if (!leave) {
       return res.status(404).json({ message: "Leave request not found" })
     }
-    //check if the leave request is pending
     const user = await User.findOneBy({ id: leave.user.id })
     if (!user) {
       return res.status(404).json({ message: "User not found" })
@@ -210,7 +209,7 @@ export class LeaveController {
     if (leave.status !== "Pending") {
       return res
         .status(400)
-        .json({ message: "Leave request is already " + leave.status })
+        .json({ message: `Leave request is already ${leave.status}` })
     }
     const { startDate, endDate, reason } = req.body
     if (!startDate || !endDate || !reason) {

@@ -3,6 +3,7 @@ import { User } from "../schemas/User"
 import "dotenv/config"
 import { Leave } from "../schemas/Leave"
 import { Timesheet } from "../schemas/Timesheet"
+import { Notification } from "../schemas/Notification"
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [User, Leave, Timesheet],
+  entities: [User, Leave, Timesheet, Notification],
   subscribers: [],
   migrations: [],
 })
