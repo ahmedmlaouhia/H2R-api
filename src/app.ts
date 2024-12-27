@@ -24,44 +24,7 @@ const io = new Server(httpServer, {
   },
 })
 
-app.use(express.json())
-app.use(cors())
-
-app.use(express.urlencoded({ extended: true }))
-app.use("/auth", authRouter)
-app.use("/user", userRouter)
-app.use("/leave", leaveRouter)
-app.use("/timesheets", timesheetRouter)
-app.use("/notifications", notificationRouter)
-
 app.use(errorHandler)
-
-AppDataSource.initialize()
-  .then(async () => {
-    console.log("Data Source has been initialized!")
-    httpServer.listen(port, () => {
-      console.log(`Example app listening on port ${port}`)
-    })
-  })
-  .catch(error => console.log(error))
-
-app.use(express.urlencoded({ extended: true }))
-app.use("/auth", authRouter)
-app.use("/user", userRouter)
-app.use("/leave", leaveRouter)
-app.use("/timesheets", timesheetRouter)
-app.use("/notifications", notificationRouter)
-
-app.use(errorHandler)
-
-AppDataSource.initialize()
-  .then(async () => {
-    console.log("Data Source has been initialized!")
-    httpServer.listen(port, () => {
-      console.log(`Example app listening on port ${port}`)
-    })
-  })
-  .catch(error => console.log(error))
 
 io.on("connection", socket => {
   socket.on("join", (userId: any) => {
