@@ -2,6 +2,17 @@ pipeline {
   agent any
   
   stages {
+    stage ('testing'){
+      when {
+        branch "devops"
+      }
+      steps {
+        echo 'testing ...'
+        sh 'npm install'
+        sh 'npm test'
+        sh ''
+      }
+    }
     stage('login to ecr') {
       when {
         branch "devops"
@@ -41,14 +52,6 @@ pipeline {
         echo 'pushing to registry ...'
         sh 'docker push 381491905102.dkr.ecr.us-east-1.amazonaws.com/bohmid/h2r-backend:v1'
       }
-    }
-  }
-  post {
-    always {
-      echo 'This will always run' 
-      echo 'Deploying H2R...'
-      sh 'docker compose --project-name htwor up -d'
-      echo 'H2R Deployed'
     }
   }
 }
