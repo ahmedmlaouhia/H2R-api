@@ -1,6 +1,7 @@
 import { Response, Request } from "express"
 import { Timesheet } from "../schemas/Timesheet"
 import { User } from "../schemas/User"
+import { Notification } from "../schemas/Notification"
 
 export class TimesheetController {
   static async createTimesheetEntry(req: any, res: Response) {
@@ -82,7 +83,16 @@ export class TimesheetController {
     timesheet.status = "Approved"
     await Timesheet.save(timesheet)
 
-    return res.status(200).json({ message: "Timesheet entry approved" })
+    // Create a notification for the user
+    const notification = new Notification()
+    notification.user = timesheet.user
+    notification.title = "Timesheet Approved"
+    notification.message = `Your timesheet entry for ${timesheet.date} has been approved.`
+    await Notification.save(notification)
+
+    return res
+      .status(200)
+      .json({ message: "Timesheet entry validated successfully" })
   }
 
   static async correctTimesheetEntry(req: Request, res: Response) {

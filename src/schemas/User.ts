@@ -9,7 +9,7 @@ import {
 } from "typeorm"
 import { Leave } from "./Leave"
 import { Timesheet } from "./Timesheet"
-
+import { Notification } from "./Notification"
 @Entity({ name: "users" })
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -38,6 +38,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Leave, leave => leave.user)
   leaves: Leave[]
+
+  @OneToMany(() => Notification, notification => notification.user)
+  notifications: Notification[]
 
   @OneToMany(() => Timesheet, timesheet => timesheet.user)
   timesheets: Timesheet[]
