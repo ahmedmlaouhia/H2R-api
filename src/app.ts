@@ -16,6 +16,7 @@ import notificationRouter from "./routes/notification.routes"
 let connectedUsers = new Map<string, string>()
 
 const app = express()
+
 const port = process.env.PORT || 3000
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
@@ -23,8 +24,6 @@ const io = new Server(httpServer, {
     origin: "*",
   },
 })
-
-app.use(errorHandler)
 
 io.on("connection", socket => {
   socket.on("join", (userId: any) => {
@@ -70,7 +69,6 @@ app.use("/user", userRouter)
 app.use("/leave", leaveRouter)
 app.use("/timesheets", timesheetRouter)
 app.use("/notifications", notificationRouter)
-
 app.use(errorHandler)
 
 AppDataSource.initialize()
