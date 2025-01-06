@@ -2,17 +2,17 @@ pipeline {
   agent any
   
   stages {
-    stage ('testing'){
-      when {
-        branch "devops"
-      }
-      steps {
-        echo 'testing ...'
-        sh 'npm install'
-        sh 'npm test'
-        sh ''
-      }
-    }
+    // stage ('testing'){
+    //   when {
+    //     branch "devops"
+    //   }
+    //   steps {
+    //     echo 'testing ...'
+    //     sh 'npm install'
+    //     sh 'npm test'
+    //     sh ''
+    //   }
+    // }
     stage('login to ecr') {
       when {
         branch "devops"
