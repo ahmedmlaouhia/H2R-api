@@ -8,12 +8,7 @@ pipeline {
       }
       steps {
         echo 'testing ...'
-        sh '''
-                export NVM_DIR="$HOME/.nvm"
-                [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-                nvm use 21
-                npm install
-                '''
+        sh 'npm install'
         sh 'npm test'
         sh ''
       }
